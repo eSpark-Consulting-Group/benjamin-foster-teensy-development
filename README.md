@@ -94,4 +94,16 @@ thinking about it now, i may need to have a startblank.txt a blank.txt and a end
 The prooject is a 3-axes controlled system i.e. Altitude, Latitude and Longitude controls. Each axis is controlled with stepper driver TB6600 amd stepper motor. The system has rotating LED arc that has ~137 RGB LEDs. There are also limiting switches whose purpose is to homing the axis to zero positions. The MCU has SD card attached to it, inside which there are text files that control LED controlling (inensity and color) at each unique encoder position, we call these text files image file. There are also some other text files whose main purpose is to trigger camera on/off at specified encoder position. Client also wants to control latiude, longitude and altitude at each unique encoder position, this will also be probably supplied thorugh SD card (will be inquired in this regard from client). For sample files please go through client requirements.
 
 
+Following paramareters are also required to read from SD card:
+
+- gamma & pulse
+- number of LEDs
+- stepper calibration
+- zero point
+- trigger start and end
+- landscape portrait or both
+- image cycle
+- altitude positions
+- geoposition sequence
+
 ![image](https://user-images.githubusercontent.com/98542270/168011770-c25e2eac-437b-4c9a-bef3-7e565da65ec9.png)
