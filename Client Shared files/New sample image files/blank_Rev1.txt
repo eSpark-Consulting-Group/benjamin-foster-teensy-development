@@ -1,0 +1,8 @@
+// To be shown between every image projection within every step, but not before the first one and not after the last one.
+// eg, blankSTART.txt, 01.txt,blank.txt,02.txt,blank.txt,03.txt,blank.txt,04.txt,blankEND.txt
+// trigger camera ON at encoder possition 0950. ie. change button state to HIGH
+
+// Duration of blankStart.txt is 1 to 999 on the rotary encoder, +1 on the rotaty encoder index, and roughly 1 second.
+
+// trigger camera button LOW  when encoder reaches possition 0050.
+// trigger camera button High when encoder reaches possition 0950.

@@ -1,0 +1,5 @@
+// Blank image file
+// to be read at the beggining of each set
+// All LEDs OFF
+// trigger camera ON at encoder possition turn button to HIGH at position 0950
+

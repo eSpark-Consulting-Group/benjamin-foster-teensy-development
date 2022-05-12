@@ -1,0 +1,8 @@
+// Blank file
+// to bea read during a mid rotation
+
+// trigger camera OFF
+at encoder possition turn button to LOW at position 0050
+
+// trigger camera ON
+at encoder possition turn button to HIGH at position 0950

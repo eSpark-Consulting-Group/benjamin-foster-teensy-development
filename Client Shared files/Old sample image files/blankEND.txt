@@ -1,0 +1,5 @@
+// Blank image file
+// to be read at the end of each set
+// All LEDs OFF
+// trigger camera OFF at encoder possition turn button to LOW at position 0050
+
