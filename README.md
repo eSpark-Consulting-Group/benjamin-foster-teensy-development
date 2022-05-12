@@ -33,6 +33,7 @@ Action List
 /////////////////////////////////// 
   
 INITIALISATION PROCESS
+  
 ///////////////////////////////////
 
 00 - From the SD card, load "Preferences.txt" (or .csv) containing all the variables I can easily copy and paste from an excel sheet (From A to J)
