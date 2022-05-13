@@ -1,18 +1,8 @@
 /*
-Wiring:
-VCC 9-42 – VDC
-GND - Power supply ground
-ENA- - Teensy GND
-ENA+ - Teensy Pin 7
-DIR- - Teensy GND
-DIR+ - Teensy Pin 8
-PUL- - Teensy GND
-PUL+ - Teensy Pin 9
-A-, A+ - Coil 1 stepper motor
-B-, B+ - Coil 2 stepper motor
 
 The pinouts provided: 
 
+Motors:
 #define Dir_ArcRotate           6
 #define STEP_ArcRotate          7
 #define Dir_Latitude            8
@@ -28,6 +18,15 @@ The pinouts provided:
 #define Latitude_ENAPIN         22             // Latitude Motor Lock
 #define AspectRatio_ENAPIN      23             // AspectRatio Motor Lock
 #define Altitude_ENAPIN         29             // Altitude Motor Lock
+
+Limiting Switches:
+#define Latitude_South          14             // Latitude Min Stop
+#define Latitude_North          15             // Latitude Max Stop
+#define AspectRatio_Landscape   16             // AspectRatio Landscape stop
+#define AspectRatio_Portrait    17             // AspectRatio Portrait stop
+#define Altitude_Min            18             // MIN distance to object stop 0mm
+#define Altitude_Max            19             // MAX distance to object stop 200mm
+
 */
 
 #include<mwc_stepper.h>
@@ -133,7 +132,7 @@ void arcMovement(){
 void latitudeMovement(){
   Latitude_Motor.set(ClOCKWISE, RPM, PULSE);
   Latitude_Motor.active(false);
-  while( (Latitude_South == 0) && (Latitude_North == 0) ){ Latitude_Motor.run(); }
+  while( (digitalRead(Latitude_South == 0)) && (digitalRead(Latitude_North == 0)) ){ Latitude_Motor.run(); }
   Latitude_Motor.active(true);
 }
 void objectRotation(){
@@ -147,12 +146,12 @@ void objectRotation(){
 void cameraAspectRatio(){
   AspectRatio_Motor.set(ClOCKWISE, RPM, PULSE);
   AspectRatio_Motor.active(false);
-  while( (AspectRatio_Landscape == 0) && (AspectRatio_Portrait == 0) ){ AspectRatio_Motor.run(); }
+  while( (digitalRead(AspectRatio_Landscape == 0)) && (digitalRead(AspectRatio_Portrait == 0)) ){ AspectRatio_Motor.run(); }
   AspectRatio_Motor.active(true);
 }
 void altitudeMovement(){
   Altitude_Motor.set(ClOCKWISE, RPM, PULSE);
   Altitude_Motor.active(false);
-  while( (Altitude_Min == 0) && (Altitude_Max == 0) ){ Altitude_Motor.run(); }
+  while( (digitalRead(Altitude_Min == 0)) && (digitalRead(Altitude_Max == 0)) ){ Altitude_Motor.run(); }
   Altitude_Motor.active(true);
 }
