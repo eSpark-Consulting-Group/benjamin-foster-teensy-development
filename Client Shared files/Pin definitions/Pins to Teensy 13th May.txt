@@ -1,0 +1,35 @@
+// Pins Connected
+#define RotaryEncoder_A         1              // Rotary Position
+#define RotaryEncoder_B         2              // Rotary Position
+#define RotaryEncoder_Index     3              // Full Rotation Count
+#define CameraTrigger           5              // Camera Button
+#define Dir_ArcRotate           6
+#define STEP_ArcRotate          7
+#define Dir_Latitude            8
+#define STEP_Latitude           9
+#define Dir_Longitude           10
+#define STEP_Longitude          11
+#define Dir_AspectRatio         12
+#define STEP_AspectRatio        28
+#define Dir_Altitude            24          
+#define STEP_Altitude           25
+#define ArcRotate_ENAPIN        20             // LED Arc Motor Lock
+#define Longitude_ENAPIN        21             // Longitude Motor Lock
+#define Latitude_ENAPIN         22             // Latitude Motor Lock
+#define AspectRatio_ENAPIN      23             // AspectRatio Motor Lock
+#define Altitude_ENAPIN         29             // Altitude Motor Lock
+
+
+// Pins in the process of being connected
+#define LED                     13             // Teensy Board LED
+#define Latitude_South          14             // Latitude Min Stop
+#define Latitude_North          15             // Latitude Max Stop
+#define AspectRatio_Landscape   16             // AspectRatio Landscape stop
+#define AspectRatio_Portrait    17             // AspectRatio Portrait stop
+#define Altitude_Min            18             // MIN distance to object stop 0mm
+#define Altitude_Max            19             // MAX distance to object stop 200mm
+#define LED_DATA                26             // LED Data
+#define LED_CLOCK               27             // LED Clock
+
+
+
