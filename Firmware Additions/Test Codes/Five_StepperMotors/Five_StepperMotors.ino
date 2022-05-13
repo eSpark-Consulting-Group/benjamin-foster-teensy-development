@@ -77,82 +77,82 @@ The pinouts provided:
 
 
 //3-Stepper Motors Configuration:
-MWCSTEPPER nema23_1(ArcRotate_ENAPIN, Dir_ArcRotate, STEP_ArcRotate);         //Arc Motor
-MWCSTEPPER nema23_2(Latitude_ENAPIN, Dir_Latitude, STEP_Latitude );           //Latitude Motor
-MWCSTEPPER nema23_3(Longitude_ENAPIN,Dir_Longitude,STEP_Longitude);           //Longitude Motor
-MWCSTEPPER nema23_4(AspectRatio_ENAPIN, Dir_AspectRatio, STEP_AspectRatio);   //AspectRatio Motor
-MWCSTEPPER nema23_5(Altitude_ENAPIN,Dir_Altitude,STEP_Altitude);              //Altitude Motor
+MWCSTEPPER Arc_Motor(ArcRotate_ENAPIN, Dir_ArcRotate, STEP_ArcRotate);                  //Arc Motor
+MWCSTEPPER Latitude_Motor(Latitude_ENAPIN, Dir_Latitude, STEP_Latitude );               //Latitude Motor
+MWCSTEPPER Longitude_Motor(Longitude_ENAPIN,Dir_Longitude,STEP_Longitude);              //Longitude Motor
+MWCSTEPPER AspectRatio_Motor(AspectRatio_ENAPIN, Dir_AspectRatio, STEP_AspectRatio);    //AspectRatio Motor
+MWCSTEPPER Altitude_Motor(Altitude_ENAPIN,Dir_Altitude,STEP_Altitude);                  //Altitude Motor
 
 // Functions:
-void disabling_Motors();
-void Arc_Motor();
-void Latitude_Motor();
-void Longitude_Motor();
-void AspectRatio_Motor();
-void Altitude_Motor();
+void disablingMotors();
+void arcMovement();
+void latitudeMovement();
+void objectRotation();
+void cameraAspectRatio();
+void altitudeMovement();
 
 void setup() {
 
-  nema23_1.init();
-  nema23_2.init();
-  nema23_3.init();
-  nema23_4.init();
-  nema23_5.init();
-  pinMode(Latitude_South,INPUT_PULLUP);
-  pinMode(Latitude_North,INPUT_PULLUP);
-  pinMode(AspectRatio_Landscape,INPUT_PULLUP);
-  pinMode(AspectRatio_Portrait,INPUT_PULLUP);
-  pinMode(Altitude_Min,INPUT_PULLUP);
-  pinMode(Altitude_Max,INPUT_PULLUP);
+  Arc_Motor.init();
+  Latitude_Motor.init();
+  Longitude_Motor.init();
+  AspectRatio_Motor.init();
+  Altitude_Motor.init();
+  pinMode(Latitude_South,INPUT_PULLDOWN);
+  pinMode(Latitude_North,INPUT_PULLDOWN);
+  pinMode(AspectRatio_Landscape,INPUT_PULLDOWN);
+  pinMode(AspectRatio_Portrait,INPUT_PULLDOWN);
+  pinMode(Altitude_Min,INPUT_PULLDOWN);
+  pinMode(Altitude_Max,INPUT_PULLDOWN);
 
-  disabling_Motors(); 
+  disablingMotors(); 
 }
 
 void loop() { 
-    Arc_Motor();
-    Latitude_Motor();
-    Longitude_Motor();
-    AspectRatio_Motor();
-    Altitude_Motor();
-    disabling_Motors(); 
+    arcMovement();
+    latitudeMovement();
+    objectRotation();
+    cameraAspectRatio();
+    altitudeMovement();
+    disablingMotors(); 
 }
-void disabling_Motors(){
-    nema23_1.active(true);
-    nema23_2.active(true);
-    nema23_3.active(true);
-    nema23_4.active(true);
+void disablingMotors(){
+    Arc_Motor.active(true);
+    Latitude_Motor.active(true);
+    Longitude_Motor.active(true);
+    AspectRatio_Motor.active(true);
   }
-void Arc_Motor(){
-  nema23_1.set(ClOCKWISE, RPM, PULSE);
-  nema23_1.active(false);
+void arcMovement(){
+  Arc_Motor.set(ClOCKWISE, RPM, PULSE);
+  Arc_Motor.active(false);
   for (size_t i = 0; i < 200; i++)  //*********** changes *********** 
   {
-      nema23_1.run();
+      Arc_Motor.run();
   }
 }
-void Latitude_Motor(){
-  nema23_2.set(ClOCKWISE, RPM, PULSE);
-  nema23_2.active(false);
-  while( (Latitude_South == 1) && (Latitude_North == 1) ){ nema23_2.run(); }
-  nema23_2.active(true);
+void latitudeMovement(){
+  Latitude_Motor.set(ClOCKWISE, RPM, PULSE);
+  Latitude_Motor.active(false);
+  while( (Latitude_South == 0) && (Latitude_North == 0) ){ Latitude_Motor.run(); }
+  Latitude_Motor.active(true);
 }
-void Longitude_Motor(){
-  nema23_3.set(ClOCKWISE, RPM, PULSE);
-  nema23_3.active(false);
+void objectRotation(){
+  Longitude_Motor.set(ClOCKWISE, RPM, PULSE);
+  Longitude_Motor.active(false);
   for (size_t i = 0; i < 200; i++)  //*********** changes *********** 
   {
-      nema23_3.run();
+      Longitude_Motor.run();
   }
 }
-void AspectRatio_Motor(){
-  nema23_4.set(ClOCKWISE, RPM, PULSE);
-  nema23_4.active(false);
-  while( (AspectRatio_Landscape == 1) && (AspectRatio_Portrait == 1) ){ nema23_4.run(); }
-  nema23_4.active(true);
+void cameraAspectRatio(){
+  AspectRatio_Motor.set(ClOCKWISE, RPM, PULSE);
+  AspectRatio_Motor.active(false);
+  while( (AspectRatio_Landscape == 0) && (AspectRatio_Portrait == 0) ){ AspectRatio_Motor.run(); }
+  AspectRatio_Motor.active(true);
 }
-void Altitude_Motor(){
-  nema23_5.set(ClOCKWISE, RPM, PULSE);
-  nema23_5.active(false);
-  while( (Altitude_Min == 1) && (Altitude_Max == 1) ){ nema23_5.run(); }
-  nema23_5.active(true);
+void altitudeMovement(){
+  Altitude_Motor.set(ClOCKWISE, RPM, PULSE);
+  Altitude_Motor.active(false);
+  while( (Altitude_Min == 0) && (Altitude_Max == 0) ){ Altitude_Motor.run(); }
+  Altitude_Motor.active(true);
 }
