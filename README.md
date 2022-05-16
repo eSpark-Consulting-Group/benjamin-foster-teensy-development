@@ -107,3 +107,8 @@ Following paramareters are also required to read from SD card:
 - geoposition sequence
 
 ![image](https://user-images.githubusercontent.com/98542270/168011770-c25e2eac-437b-4c9a-bef3-7e565da65ec9.png)
+
+## Links to some of the components used:
+
+- Rotary encoder: https://cdn-shop.adafruit.com/product-files/2351/SK9822_datasheet_SHIJI.pdf
+- RGB LED: https://cdn-shop.adafruit.com/product-files/2351/SK9822_datasheet_SHIJI.pdf
