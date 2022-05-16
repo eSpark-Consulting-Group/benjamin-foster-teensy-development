@@ -1,7 +1,7 @@
 #include <AccelStepper.h>
 // Create an IntervalTimer object 
 IntervalTimer ArcMotor_timer;
-void Arc_Motor_Operation();
+void Arc_Motor_Operation();   
 
 #define Dir_ArcRotate               6
 #define STEP_ArcRotate              7
@@ -17,28 +17,23 @@ void setup() {
     ArcMotor.setAcceleration(ArcRotateAcceleration);
     ArcMotor.setEnablePin(ArcRotate_ENAPIN);
     Serial.begin(9600);
-    ArcMotor_timer.begin(Arc_Motor_Operation, 15000);  // blinkLED to run every 0.15 seconds
+    ArcMotor_timer.begin(Arc_Motor_Operation, 2500);  // Arc_Motor_Operation to run every 0.0025 seconds
 }
 
 volatile unsigned long steps = 0; // use volatile for shared variables
 
 
 void loop() {
-  unsigned long stepsCopy;  // holds a copy of the blinkCount
+  unsigned long stepsCopy;  
 
-  // to read a variable which the interrupt code writes, we
-  // must temporarily disable interrupts, to be sure it will
-  // not change while we are reading.  To minimize the time
-  // with interrupts off, just quickly make a copy, and then
-  // use the copy while allowing the interrupt to keep working.
   noInterrupts();
   stepsCopy = steps;
   interrupts();
-
-  Serial.println("To verify that the Arc Motor is running:");
-  Serial.println("Steps = ");
+  if(steps == 400 ){
+  Serial.print("Two Revolutions are completed Steps = 400");
   Serial.println(stepsCopy);
   delay(100);
+  }
 }
 void Arc_Motor_Operation(){
       ArcMotor.runSpeed();
