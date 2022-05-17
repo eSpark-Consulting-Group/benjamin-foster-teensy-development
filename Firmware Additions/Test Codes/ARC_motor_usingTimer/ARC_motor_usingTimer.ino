@@ -36,6 +36,6 @@ void loop() {
   }
 }
 void Arc_Motor_Operation(){
-      ArcMotor.runSpeed();
+      ArcMotor.run();
       ++steps;
   }
