@@ -2,7 +2,7 @@
 // Create an IntervalTimer object 
 IntervalTimer ArcMotor_timer;
 void Arc_Motor_Operation();   
-
+#define motorInterfaceType          1
 #define Dir_ArcRotate               6
 #define STEP_ArcRotate              7
 #define ArcRotate_ENAPIN            20
@@ -10,7 +10,7 @@ void Arc_Motor_Operation();
 #define ArcRotateAcceleration       300   
 #define ArcRotateSpeed              400     
 
-AccelStepper ArcMotor(AccelStepper::DRIVER, STEP_ArcRotate, Dir_ArcRotate);
+AccelStepper ArcMotor(motorInterfaceType, STEP_ArcRotate, Dir_ArcRotate);
 
 void setup() {
     ArcMotor.setSpeed(ArcRotateSpeed);

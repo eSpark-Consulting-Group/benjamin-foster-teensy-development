@@ -5,7 +5,8 @@ void SD_Card_read(); //function to read the text file from SD-card
 void parseData();    //function to parse the data 
  
 const int chipSelect = 10;
-static char value[20];    //token values
+char* value;    //token values
+String bufferVal[100];
 static int ndx = 0;       //line index
 
 // Variables to store parse data:
@@ -62,17 +63,18 @@ void loop() {
 }
 void SD_Card_read(){
   
-    int i = 0;                //buffer(value) index
+   static int numString = 0, index = 0;                //buffer(value) number
+   
     
     while(MyFile.available()){
     
       if(MyFile.peek() != '\0'){
-            value[i] = MyFile.read();
-            i++;
+            bufferVal[numString] = MyFile.readStringUntil('\n');
+            index++;
       }
       else{
-            value[i+1] = '\0';
-            ++ndx; 
+            strcpy(value,bufferVal[numString]);
+            ++numString; 
             Serial.print("MCU reads the Line number#");
             Serial.print(ndx);
             Serial.print(" from the SD-card");
@@ -93,9 +95,9 @@ void parseData(void)
   strtokIndx = strtok(NULL, ",");
   LongitudeVal = atof(strtokIndx);     // convert this part to a float
 
-  Serial.println(valstring);
-  Serial.print("Latitude");
-  Serial.println(LatitudeVal);
-  Serial.print("Longitude");
+  Serial.print(valstring);
+  Serial.print(" Latitude: ");
+  Serial.print(LatitudeVal);
+  Serial.print(" Longitude: ");
   Serial.println(LongitudeVal);
 }
