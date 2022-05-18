@@ -20,7 +20,7 @@ void setup() {
     ArcMotor.setSpeed(ArcRotateSpeed);
     ArcMotor.setMaxSpeed(ArcRotateMaxSpeed);
     Serial.begin(9600);
-    ArcMotor_timer.begin(Arc_Motor_Operation, 2500);  // Arc_Motor_Operation to run every 0.0025 seconds
+    ArcMotor_timer.begin(ArcMotor.runSpeed(), 2500);  // Arc_Motor_Operation to run every 0.0025 seconds
 }
 
 volatile unsigned long steps = 0; // use volatile for shared variables
@@ -38,7 +38,3 @@ void loop() {
   delay(100);
   }
 }
-void Arc_Motor_Operation(){
-      ArcMotor.run();
-      ++steps;
-  }
