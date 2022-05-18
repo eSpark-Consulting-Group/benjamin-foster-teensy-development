@@ -1,12 +1,15 @@
 // Include the AccelStepper library:
 #include <AccelStepper.h>
 
-#define dirPin 6
-#define stepPin 7
-#define ENPin 20
+#define dirPin 2
+#define stepPin 3
+#define ENPin 4
 #define motorInterfaceType 1
 
 AccelStepper stepper = AccelStepper(motorInterfaceType, stepPin, dirPin);
+unsigned long previousTimeARC = millis();
+long timeIntervalARC = 0.0025;
+bool Arcflag;
 
 void setup() {
 
@@ -18,6 +21,13 @@ void setup() {
 }
 
 void loop() {
-  // Step the motor with a constant speed as set by setSpeed():
-  stepper.runSpeed();
+  ArcTicker();
 }
+void ArcTicker(){
+  unsigned long currentTime = millis();
+  if(currentTime - previousTimeARC > timeIntervalARC) {
+    previousTimeARC = currentTime;
+     stepper.runSpeed();
+  } 
+}
+   
