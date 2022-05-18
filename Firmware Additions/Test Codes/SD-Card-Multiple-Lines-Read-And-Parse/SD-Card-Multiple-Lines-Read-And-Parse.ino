@@ -1,16 +1,18 @@
 
 #include <SD.h>
 #include <SPI.h>
-void SD_Card_read(); //function to read the text file from SD-card
-void parseData();    //function to parse the data
+void SD_Card_read();                //function to read the text file from SD-card
+void parseData();                   //function to parse the data
 
-const int chipSelect = 10;
-char value[250],temp[25];    //token values
-static int ndx = 0;       //line index
+const int chipSelect = 10;          //SD-Card default pin
 
-// Variables to store parse data:
-static char valstring[12];
-static float LatitudeVal, LongitudeVal;
+char value[25000]={},temp[25]={};           //Arrays to hold the data MCU read from the text file
+static int ndx = 0;                        //To verify the line number MCU is reading
+
+
+//Variables to hold the parsed data:         
+int indexNum;             
+float LatitudeVal, LongitudeVal;
 
 File MyFile;
 
@@ -36,7 +38,7 @@ void setup() {
   Serial.println("initialization done.");
 
 
-  // re-open the file for reading:
+  // Reading and Printing the "Hello.txt" file on the Serial Monitor to verify its content: 
   MyFile = SD.open("Hello.txt");
   if (MyFile) {
     Serial.println("Hello.txt is avaiable");
@@ -51,25 +53,24 @@ void setup() {
     Serial.println("error opening Hello.txt");
   }
   Serial.println();
+
+  // Opening the "Hello.txt" and then by calling SD_Card_read() function, we're performing the reading & parsing of our data
   MyFile = SD.open("Hello.txt");
   SD_Card_read();
- // parseData();
 }
 
 void loop() {
-  // nothing happens after setup
 
 }
 void SD_Card_read() {
 
   static int i = 0;                                                         //buffer(value) index
-  static int character_count =0 ,previous_count = 0;
+  static int character_count =0 ,previous_count = 0;                        //Variables to hold the number of characters read by MCU
+  int k;
   
   while (MyFile.available()) {
-      // Serial.println(MyFile.available());                                // To cross-verify my loop
       
-    //if(MyFile.available() != 2){
-     if (MyFile.peek() != '\r' || MyFile.peek() == 'V') {  
+     if (MyFile.peek() != '\r' /*|| MyFile.peek() == 'V'*/) {  
           value[i] = MyFile.read();
           i++;
           character_count++;
@@ -77,11 +78,7 @@ void SD_Card_read() {
     else {
       MyFile.read();
       ++ndx;
-      //Serial.print("********Charater Count: ");
-      //Serial.println(character_count);
-      //substr(previous_line, character)
-      //->parseData
-      int k = 0;
+      k = 0;
       
       for(int j = previous_count; j <= character_count ; j++ ){
           if( value[j] != '\n'){
@@ -89,23 +86,20 @@ void SD_Card_read() {
                 k++;
               }
           if(j == character_count){ 
-           // temp[j+1] = '\0';
             k=0;
           }
         }
-       Serial.print("temp[j] = ");
-       Serial.println(temp);
+        Serial.print("temp[j] = ");                                          //Printing the each line data extracted from the text file
+        Serial.println(temp);
+
+        Serial.print("MCU reads the Line number#");
+        Serial.print(ndx);
+        Serial.println(" from the SD-card");
        
-      parseData(temp);                                                      //Sending a single line to parse
+       parseData(temp);                                                      //Sending a single line to parse
 
       previous_count = character_count;
-
-      //Serial.print("MCU reads the Line number#");
-      //Serial.print(ndx);
-      //Serial.println(" from the SD-card");
     }
-   // Serial.println("*********Value array**********");
-   // Serial.println(value);
   }
 }
 void parseData(char* workVar)
@@ -113,8 +107,8 @@ void parseData(char* workVar)
 
   char * strtokIndx;                                // this is used by strtok() as an index
 
-  strtokIndx = strtok(workVar, ",");     
-  strcpy(valstring, strtokIndx); 
+  strtokIndx = strtok(workVar, ",");  
+  indexNum = atoi(strtokIndx);   
 
   strtokIndx = strtok(NULL, ","); 
   LatitudeVal = atof(strtokIndx);     
@@ -123,7 +117,7 @@ void parseData(char* workVar)
   LongitudeVal = atof(strtokIndx);     
 
   Serial.println("***** Parsed Data ******");
-  Serial.println(valstring);
+  Serial.println(indexNum);
   Serial.print("Latitude: ");
   Serial.println(LatitudeVal);
   Serial.print("Longitude: ");
