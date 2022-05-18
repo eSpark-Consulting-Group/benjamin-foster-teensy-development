@@ -4,7 +4,7 @@
 void SD_Card_read();                //function to read the text file from SD-card
 void parseData();                   //function to parse the data
 
-const int chipSelect = 10;          //SD-Card default pin
+const int chipSelect = BUILTIN_SDCARD;          //SD-Card default pin
 
 char value[25000]={},temp[25]={};           //Arrays to hold the data MCU read from the text file
 static int ndx = 0;                        //To verify the line number MCU is reading

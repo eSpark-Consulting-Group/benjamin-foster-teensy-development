@@ -13,9 +13,12 @@ void Arc_Motor_Operation();
 AccelStepper ArcMotor(motorInterfaceType, STEP_ArcRotate, Dir_ArcRotate);
 
 void setup() {
-    ArcMotor.setSpeed(ArcRotateSpeed);
-    ArcMotor.setAcceleration(ArcRotateAcceleration);
     ArcMotor.setEnablePin(ArcRotate_ENAPIN);
+    ArcMotor.setPinsInverted(false, false, true);
+    ArcMotor.enableOutputs();
+    ArcMotor.setAcceleration(ArcRotateAcceleration);
+    ArcMotor.setSpeed(ArcRotateSpeed);
+    ArcMotor.setMaxSpeed(ArcRotateMaxSpeed);
     Serial.begin(9600);
     ArcMotor_timer.begin(Arc_Motor_Operation, 2500);  // Arc_Motor_Operation to run every 0.0025 seconds
 }
