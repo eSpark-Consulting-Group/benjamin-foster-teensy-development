@@ -1,9 +1,9 @@
 // Include the AccelStepper library:
 #include <AccelStepper.h>
 
-#define dirPin 2
-#define stepPin 3
-#define ENPin 4
+#define dirPin 6
+#define stepPin 7
+#define ENPin 20
 #define motorInterfaceType 1
 
 AccelStepper stepper = AccelStepper(motorInterfaceType, stepPin, dirPin);
