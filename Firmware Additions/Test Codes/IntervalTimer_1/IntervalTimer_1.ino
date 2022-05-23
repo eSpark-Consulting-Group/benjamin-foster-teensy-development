@@ -5,9 +5,9 @@ IntervalTimer ArcTimer;
 bool arcStep = false;
 //Motors Pinouts & Configuration:
 #define motorInterfaceType          1
-#define Dir_ArcRotate               2
-#define STEP_ArcRotate              3
-#define ArcRotate_ENAPIN            4
+#define Dir_ArcRotate               6 //6
+#define STEP_ArcRotate              7 //7
+#define ArcRotate_ENAPIN            20 //20
 #define ArcRotateMaxSpeed           400
 #define ArcRotateAcceleration       300
 #define ArcRotateSpeed              400
@@ -17,11 +17,11 @@ AccelStepper ArcMotor = AccelStepper(motorInterfaceType, STEP_ArcRotate, Dir_Arc
 void setup() {
   Serial.begin(9600);
   ArcMotor_Initialization();
-  ArcTimer.begin(ArcStep, 2500);  // blinkLED to run every 0.15 seconds
+  ArcTimer.begin(ArcStep, 2500);  // Run ArcMotor every 0.0025 seconds
 }
 
-void loop() {
-    ArcTicker();
+void loop() 
+{  
 }
 void ArcMotor_Initialization() {
   pinMode(ArcRotate_ENAPIN,OUTPUT);
@@ -32,15 +32,7 @@ void ArcMotor_Initialization() {
   ArcMotor.setAcceleration(ArcRotateAcceleration);
   ArcMotor.setSpeed(ArcRotateSpeed);
 }
-void ArcTicker() {
-  if (arcStep == true) {
-    ArcMotor.runSpeed();
-    arcStep = false;
-  }
-  else {
-    ArcMotor.disableOutputs();
-    }
-}
+
 void ArcStep(){
-    arcStep = true;
+    ArcMotor.runSpeed();
   }
