@@ -8,6 +8,7 @@
 void ArcMotor_Initialization();                               //Arc Motor Initialization
 void ArcTimer_setup();                                        // Arc Motor Timer
 void LatMotor_Initialization();                               //Latitude Motor Initialization
+void LonMotor_Initialization();                               //Longitude Motor Initialization
 void SD_Card_Initialization();                                //SD Card Initialization
 void SD_Card_read();                                          //function to read the text file from SD-card
 void SDCard_LineExtraction();                                 // Extracting each line read by SD-card
@@ -16,28 +17,32 @@ void parseData(char* workVar, int* ndx);                      //function to pars
 
 //Motors Pinouts and Configurations:
 #define motorInterfaceType          1
-#define Dir_ArcRotate               5 //6
-#define STEP_ArcRotate              6 //7
-#define ArcRotate_ENAPIN            7 //20
+#define Dir_ArcRotate               9 //6
+#define STEP_ArcRotate              10 //7
+#define ArcRotate_ENAPIN            A0 //20
 #define ArcRotateMaxSpeed           400
 #define ArcRotateAcceleration       300
 #define ArcRotateSpeed              400
 #define Dir_Latitude                2
 #define STEP_Latitude               3
 #define Latitude_ENAPIN             4
+#define Dir_Longitude                5
+#define STEP_Longitude               6
+#define Longitude_ENAPIN             7
 
 AccelStepper ArcMotor = AccelStepper(motorInterfaceType, STEP_ArcRotate, Dir_ArcRotate);
 AccelStepper LatMotor = AccelStepper(motorInterfaceType, STEP_Latitude, Dir_Latitude);
+AccelStepper LonMotor = AccelStepper(motorInterfaceType, STEP_Longitude, Dir_Longitude);
 
-unsigned long previousTimeLatLon = millis();
-long timeIntervalLatLon = 3;
+unsigned long previousTimeLatLon;
+long timeIntervalLatLon = 5;
 
 //SD Card Pinouts & Configuration
 //const int chipSelect = BUILTIN_SDCARD;                //SD-Card default pin
-char value[120] = {}, temp[14] = {};                  //Arrays to hold the data MCU read from the text file
+char value[55] = {}, temp[14] = {};                  //Arrays to hold the data MCU read from the text file
 
 
-int indexNum[10], LatitudeVal[10], LongitudeVal[10];     //Variables to hold the parsed data:
+int indexNum[5], LatitudeVal[5], LongitudeVal[5];     //Variables to hold the parsed data:
 int ndx = 0;                                          //indexes of the EncoderIndex,Latitude & Longitude arrays
 File MyFile;
 
@@ -49,6 +54,7 @@ void setup()
   SD_Card_read();
   ArcMotor_Initialization();
   LatMotor_Initialization();
+  LonMotor_Initialization();
   ArcTimer_setup();
   sei(); //allow interrupts
 }
@@ -66,6 +72,15 @@ void ArcMotor_Initialization() {
   ArcMotor.setMaxSpeed(ArcRotateMaxSpeed);
   ArcMotor.setAcceleration(ArcRotateAcceleration);
   ArcMotor.setSpeed(ArcRotateSpeed);
+}
+void LonMotor_Initialization() {
+  LonMotor.setEnablePin(Longitude_ENAPIN);
+  LonMotor.setPinsInverted(false, false, true);
+  LonMotor.enableOutputs();
+  LonMotor.setMaxSpeed(1000);
+  LonMotor.setAcceleration(50);
+  LonMotor.setSpeed(200);
+  previousTimeLatLon = millis();
 }
 void LatMotor_Initialization() {
   LatMotor.setEnablePin(Latitude_ENAPIN);
@@ -85,23 +100,35 @@ void LatLonTicker(int* ndx)
     if (currentTimeLatLon - previousTimeLatLon > timeIntervalLatLon)
     {
       currentTimeLatLon = previousTimeLatLon;
-      //Serial.println(LatitudeVal[action_index]);
+
       LatMotor.moveTo(LatitudeVal[action_index]);
+      LonMotor.moveTo(LongitudeVal[action_index]);
       LatMotor.setSpeed(200);
-      if (LatMotor.distanceToGo() != 0)
+      LonMotor.setSpeed(200);
+      if (LonMotor.distanceToGo() != 0 && action_index != *ndx)
       {
-        Serial.println("working");
-        LatMotor.runSpeed();
+          LonMotor.runSpeed();
+        if(LatMotor.distanceToGo() != 0)
+        {
+          //Serial.println("working");
+          LatMotor.runSpeed();
+        }
       }
       else
       {
-        LatMotor.setCurrentPosition(0);
+        LonMotor.setCurrentPosition(0);
         Serial.println("****Latitude and Longitude Motors Moves****");
         Serial.print("action index : ");
         Serial.print(action_index);
         Serial.print(" , Latitude Moves: ");
         Serial.println(LatitudeVal[action_index]);
+        Serial.print(" , Longitude Moves: ");
+        Serial.println(LongitudeVal[action_index]);
         action_index++;
+        if(action_index >= *ndx){
+          LatMotor.disableOutputs();
+          LonMotor.disableOutputs();
+          }
       }
     }
   }
@@ -121,7 +148,7 @@ void ArcTimer_setup()
   TIMSK1 |= (1 << OCIE1A);
 }
 ISR(TIMER1_COMPA_vect)
-{ 
+{  
   static bool flag = false;
   flag = !flag;
   digitalWrite(STEP_ArcRotate,flag);
@@ -194,13 +221,15 @@ void parseData(char* workVar, int* ndx)
 
   strtokIndx = strtok(workVar, ",");
   indexNum[*ndx] = atoi(strtokIndx);
-
+  Serial.println("array index to stored values: ");
+  Serial.println(*ndx);
   strtokIndx = strtok(NULL, ",");
   LatitudeVal[*ndx] = atoi(strtokIndx);
-
+  Serial.println(*ndx);
   strtokIndx = strtok(NULL, ",");
   LongitudeVal[*ndx] = atoi(strtokIndx);
-
+  Serial.println(*ndx);
+  
   Serial.println("***** Parsed Data ******");
   Serial.println(indexNum[*ndx]);
   Serial.print("Latitude: ");
