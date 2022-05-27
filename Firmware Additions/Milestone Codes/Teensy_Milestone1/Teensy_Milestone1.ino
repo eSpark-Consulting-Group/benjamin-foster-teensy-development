@@ -51,7 +51,7 @@ unsigned long timeIntervalLatLon = 3;
 
 //SD Card Pinouts & Configuration
 const int chipSelect = BUILTIN_SDCARD;                      //SD-Card default pin
-char value[2500] = {}, temp[50] = {};                       //Arrays to hold the data MCU read from the text file
+char value[3500] = {}, temp[100] = {};                       //Arrays to hold the data MCU read from the text file
 
 int indexNum[300], LatitudeVal[300], LongitudeVal[300];     //Variables to hold the parsed data:
 int ndx = 0;                                                //indexes of the EncoderIndex,Latitude & Longitude arrays
