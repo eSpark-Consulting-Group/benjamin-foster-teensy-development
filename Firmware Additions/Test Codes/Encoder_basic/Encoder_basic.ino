@@ -13,6 +13,7 @@ void updateEncoder();
 void EncoderInit();
 
 //SD-card Variables:
+#define chipSelect BUILTIN_SDCARD
 char token[20];
 String _buffer;
 int ndx = 0 ;
@@ -73,12 +74,12 @@ void LedExecution()
 }
 void SD_Card_Initialization() {
   while (!Serial);
-  pinMode(8, OUTPUT);
-  digitalWrite(8, HIGH);
+  pinMode(chipSelect, OUTPUT);
+  digitalWrite(chipSelect, HIGH);
 
   Serial.print("Initializing SD card...");
 
-  if (!SD.begin(8)) {
+  if (!SD.begin(chipSelect)) {
     Serial.println("initialization failed. Things to check:");
     Serial.println("1. is a card inserted?");
     Serial.println("2. is your wiring correct?");
@@ -87,15 +88,15 @@ void SD_Card_Initialization() {
     while (true);
   }
   Serial.println("initialization done.");
-  MyFile = SD.open("Hello.txt");
+  MyFile = SD.open("Image.txt");
   if (MyFile) {
-    Serial.println("Hello.txt is avaiable");
+    Serial.println("Image.txt is avaiable");
     MyFile.close();
   }
   else {
-    Serial.println("error opening Hello.txt");
+    Serial.println("error opening Image.txt");
   }
-  MyFile = SD.open("Hello.txt");
+  MyFile = SD.open("Image.txt");
 }
 void SD_Card_read() {
 
