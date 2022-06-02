@@ -8,8 +8,9 @@
 //Flags:
 bool ledExec_Flag = true;
 bool Ledseq_readflag = true;
-int arcstep = -1;
+int arcstep = 1;
 bool arcFlag = false;
+//bool arcledflag
 
 //SD Card Pinouts & Configuration
 const int chipSelect = 10; //BUILTIN_SDCARD;  
@@ -59,7 +60,7 @@ void setup() {
 void loop() {
     Ledseq_Read();
 }
-void EncoderInit()
+/*void EncoderInit()
 {
   pinMode(2,INPUT);
   attachInterrupt(digitalPinToInterrupt(2), updateEncoder, CHANGE);
@@ -67,21 +68,20 @@ void EncoderInit()
 void updateEncoder()
 {
   
-}
+}*/
 void Led_Initialization()
 {
   FastLED.addLeds<WS2812B, DATA_PIN, RGB>(leds, NUM_LEDS); 
-  //FastLED.addLeds<SK9822, DATA_PIN, CLOCK_PIN, RGB>(leds, NUM_LEDS); 
   FastLED.setMaxRefreshRate(400,true);
   Serial.println("RGB Led Initialized");
 }
 void LedExecution()
 {
-  arcFlag = true;
   leds[ledNum] = CRGB(brightness[0], brightness[1], brightness[2]);
-  if(ledNum == 50 && ledExec_Flag == true && arcstep == indexNum_Ledseq ) { 
+  if(ledNum == 50 && ledExec_Flag == true &&  arcFlag == false ) { 
     FastLED.show(); 
     Serial.println("EXECUTED");
+    arcFlag = true;
     }
 }
 void SD_Card_Initialization() 
@@ -99,11 +99,18 @@ void SD_Card_Initialization()
 }
 void Ledseq_Read() 
 {
-  while ( ( MyFile.available()) && (Ledseq_readflag == true)  ) 
+  Serial.println(arcstep);
+  Serial.println(indexNum_Ledseq);
+  if(arcstep >= 400){
+    MyFile.close();
+    MyFile = SD.open("LedSeq.txt");
+    arcstep = 0;
+  }
+  while ( ( MyFile.available()) && (Ledseq_readflag == true) && (arcstep<=400)  ) 
   {
       //Serial.println("LedSeq Reading 50 Lines.");
-      //for( int lines = 1; lines <= 50; lines++)
-      //{
+      for( int lines = 1; lines <= 50; lines++)
+      {
         _buffer = MyFile.readStringUntil('\r');
         _buffer.toCharArray(token,20);
         /*if( lines == 50 )
@@ -112,7 +119,7 @@ void Ledseq_Read()
           ledExec_Flag = true;
         }*/
         Ledseq_parseData(token);
-      //}
+      }
       
       //Ledseq_readflag = false; //140 leds are actuated, wait for encoder interrupt
   }
@@ -159,7 +166,7 @@ void ArcTimer_setup()
   TCCR4B = 0;// same for TCCR1B
   TCNT4  = 0;//initialize counter value to 0
   // set compare match register for 1hz increments
-  OCR4A = 782;// = (16*10^6) / (1024*800) - 1 = 19.5
+  OCR4A = 449; //457(working);// = (16*10^6) / (1024*1) -1 = 19.5
   // turn on CTC mode
   TCCR4B |= (1 << WGM12);
   // Set CS12 and CS10 bits for 1024 prescaler
@@ -170,15 +177,26 @@ void ArcTimer_setup()
 }
 ISR(TIMER4_COMPA_vect)
 { 
-  if(arcFlag == true)
-  {
-  arcstep++;
-  static bool flag = false;
-  flag = !flag;
-  digitalWrite(STEP_ArcRotate,flag);
-  Serial.print("arcstep = ");
+  if(arcstep == 400){
+    arcstep++;
+  Serial.print("One Rev Complete : arcstep = ");
   Serial.println(arcstep);
   }
+  else if ( arcstep < 400 ){
+   if(arcFlag == true) {
+    arcstep++;
+    static bool flag = true;
+    digitalWrite(STEP_ArcRotate,flag);
+    flag = !flag;
+    digitalWrite(STEP_ArcRotate,flag);
+    flag = !flag;
+    arcFlag = false;
+   }
+  }
+  else{ 
+   // arcstep = 0;
+    }
+
 }
 void ArcMotor_Initialization() {
   pinMode(ArcRotate_ENAPIN,OUTPUT);
