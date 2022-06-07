@@ -21,11 +21,11 @@ void LatLonTimer_setup();
 void LatLonMotors();  //ISR for LatLonTimer_setup
 
 //Flags:
-bool LatLonFlag = false;
 bool revFlag = false; // Indicates 1 rev is complete & re-open LedSeq.txt
+bool readFlag = true;
 int  action_index = 0;
-int  arcstep = 1;
-bool arcFlag = false;
+int  arcstep = 0;
+int8_t revCount = 0;
 
 //SD Card Pinouts & Configuration
 const int chipSelect = BUILTIN_SDCARD; //BUILTIN_SDCARD;  
@@ -44,7 +44,7 @@ int indexNum_Ledseq,ledNum,brightness[3];
 //LED Variables:
 #define NUM_LEDS 50
 #define DATA_PIN 3
-//#define CLOCK_PIN 13
+#define CLOCK_PIN 13
 #define FRAMES_PER_SECOND  120
 CRGB leds[NUM_LEDS];
 
@@ -68,7 +68,6 @@ IntervalTimer LatLonTimer;
 AccelStepper LatMotor = AccelStepper(motorInterfaceType, STEP_Latitude, Dir_Latitude);
 AccelStepper LonMotor = AccelStepper(motorInterfaceType, STEP_Longitude, Dir_Longitude);
 
-
 void setup() {
   Serial.begin(115200);
   SD_Card_Initialization();
@@ -79,7 +78,8 @@ void setup() {
   EncoderInit();
   LatLonTimer_setup();
 }
-void loop() {
+void loop() 
+{
   Ledseq_Read();
 }
 void SD_Card_Initialization() 
@@ -150,11 +150,12 @@ void Ledseq_Read()
    // Serial.println("************************CLOSED & OPEN LEDSEQ.TXT");
     revFlag = false;
   }
-  while ( ( MyFile.available()) && (arcFlag == false) ) 
+  while (  MyFile.available() && readFlag == true ) 
   {
       //Serial.println("LedSeq Reading 50 Lines.");
       for( int lines = 1; lines <= 50; lines++)
       {
+        readFlag = false;
         _buffer = MyFile.readStringUntil('\r');
         _buffer.toCharArray(token,20);
         Ledseq_parseData(token);
@@ -178,6 +179,7 @@ void Ledseq_parseData(char* workVar)
 
     strtokIndx = strtok(NULL, "\r");
     brightness[2] = atoi(strtokIndx);
+    leds[ledNum] = CRGB(brightness[0], brightness[1], brightness[2]);
 
     //Serial.println("***** Parsed Data Encoder Pos from TXT ******");
     //Serial.println(indexNum_Ledseq);
@@ -189,17 +191,17 @@ void Ledseq_parseData(char* workVar)
     Serial.println(brightness[1]);
     Serial.print("B: ");
     Serial.println(brightness[2]);*/
-    ndx_Ledseq++;
-    LedExecution();
+    //ndx_Ledseq++;
+    //LedExecution();
 }
 void Led_Initialization()
 {
-  FastLED.addLeds<WS2812B, DATA_PIN, RGB>(leds, NUM_LEDS); 
-  //FastLED.addLeds<SK9822, DATA_PIN, CLOCK_PIN, RGB>(leds, NUM_LEDS); 
+  //FastLED.addLeds<WS2812B, DATA_PIN, RGB>(leds, NUM_LEDS); 
+  FastLED.addLeds<SK9822, DATA_PIN, CLOCK_PIN, RGB>(leds, NUM_LEDS); 
   FastLED.setMaxRefreshRate(400,true);
   Serial.println("RGB Led Initialized");
 }
-void LedExecution()
+/*void LedExecution()
 {
   leds[ledNum] = CRGB(brightness[0], brightness[1], brightness[2]);
   if(ledNum == 50) { 
@@ -209,7 +211,7 @@ void LedExecution()
     //Serial.println("EXECUTED");
     arcFlag = true;
     }
-}
+}*/
 void EncoderInit()
 {
   attachInterrupt(1, updateEncoder, CHANGE);
@@ -217,21 +219,26 @@ void EncoderInit()
 }
 void updateEncoder()
 { 
-  if( ( MainEncoder.read() == indexNum_geoSeq[action_index] ) && (action_index < LatLon_ndx) )
-  {
-    LatMotor.moveTo(LatitudeVal[action_index]);
-    LonMotor.move(LongitudeVal[action_index]);
-    action_index++;
-    LatLonFlag = true;
-  }
-  if(arcFlag == true)
-  {
-    arcFlag = false;
-    arcstep++;
+   readFlag = true;
+   FastLED.show(); 
+   Serial.println("LEDS EXECUTED");
+   Serial.print("arcStep : ");
+   Serial.println(arcstep);
+   arcstep++;
     if(MainEncoder.read() == 200)
     {
+      revCount++;
       arcstep = 0;
       revFlag = true;
+      if( revCount%8 == 0 )
+      {
+        revCount = 0;
+        Serial.println("Move");
+        LatMotor.moveTo(LatitudeVal[action_index]);
+        LonMotor.move(LongitudeVal[action_index]);
+        action_index++;
+        LatLonFlag = true;
+      }    
     }
   }
 }
@@ -257,12 +264,17 @@ void LatLonTimer_setup()
 }
 void LatLonMotors()
 {
-  if(LonMotor.distanceToGo() != 0)
+  static bool flag = false;
+  if(LatLonFlag == true)
   {
-    LonMotor.runSpeed();
-    if(LatMotor.distanceToGo() != 0)
-    {
-      LatMotor.runSpeed();
+    if(LonMotor.distanceToGo() != 0)
+    { 
+      flag = !flag;
+      digitalWrite(STEP_Latitude, flag);
+      if(LatMotor.distanceToGo() != 0)
+      {
+        digitalWrite(STEP_Longitude, flag);
+      }
     }
   }    
   else
