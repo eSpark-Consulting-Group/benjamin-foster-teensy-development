@@ -21,6 +21,7 @@ void LatLonTimer_setup();
 void LatLonMotors();  //ISR for LatLonTimer_setup
 
 //Flags:
+bool LatLonFlag = false;
 bool revFlag = false; // Indicates 1 rev is complete & re-open LedSeq.txt
 bool readFlag = true;
 int  action_index = 0;
@@ -56,12 +57,12 @@ Encoder MainEncoder(rotaryA, rotaryB);
 
 //Motors Pinouts and Configurations:
 #define motorInterfaceType          1
-#define Dir_Latitude                4
-#define STEP_Latitude               5
-#define Latitude_ENAPIN             6
-#define Dir_Longitude               7
-#define STEP_Longitude              8
-#define Longitude_ENAPIN            9
+#define Dir_Latitude                8
+#define STEP_Latitude               9
+#define Latitude_ENAPIN             22
+#define Dir_Longitude               10
+#define STEP_Longitude              11
+#define Longitude_ENAPIN            21
 
 IntervalTimer LatLonTimer;
 
@@ -225,8 +226,9 @@ void updateEncoder()
    Serial.print("arcStep : ");
    Serial.println(arcstep);
    arcstep++;
-    if(MainEncoder.read() == 200)
+    if(MainEncoder.read() == 999)
     {
+      MainEncoder.write(0);
       revCount++;
       arcstep = 0;
       revFlag = true;
@@ -240,7 +242,6 @@ void updateEncoder()
         LatLonFlag = true;
       }    
     }
-  }
 }
 void LonMotor_Initialization() {
   LonMotor.setEnablePin(Longitude_ENAPIN);
