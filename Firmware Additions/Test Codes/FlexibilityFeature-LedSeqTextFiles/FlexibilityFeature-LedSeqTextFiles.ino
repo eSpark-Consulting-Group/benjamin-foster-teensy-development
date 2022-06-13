@@ -4,6 +4,7 @@
 int TrigOn,TrigOff;       //Variables to hold Camera Triggering On/Off values.
 uint16_t num_LedSeqFiles; //variable to hold the number of LedSeq Text files.
 String str;               //String variable to use as an "LedSeqn.txt", where 'n' is the number of LedSeq text file.
+String var;
 bool revFlag = false;
 
 //SD Card Pinouts & Configuration
@@ -58,13 +59,14 @@ void LedSeqFiles()
     MyFile.close();
     if( n <= num_LedSeqFiles )
     {
-      str = "LedSeq" + String(n) + ".txt";
-      Serial.println(str);
+      str = "LedSeq" + String(n) + ".txt";  //"LedSeq1.txt"
+      str.toCharArray(token,20);
+      Serial.println(token);
     
-      MyFile = SD.open(str);
+      MyFile = SD.open(token);
       Serial.println(str + " is open!");
     
-      if(n == num_LedSeqFiles){ Serial.println("Objective Achieved!"); } //n = 0;
+      if(n == num_LedSeqFiles){ Serial.print("Feature Working!"); }      //Serial.println("Objective Achieved!");
       n++;
     }
   }
