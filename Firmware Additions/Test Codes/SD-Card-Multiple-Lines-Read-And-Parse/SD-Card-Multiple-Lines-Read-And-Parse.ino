@@ -3,10 +3,10 @@
 #include <SPI.h>
 void SD_Card_read();                //function to read the text file from SD-card
 void parseData();                   //function to parse the data
+//#define BUILTIN_SDCARD 10
+const int chipSelect = 8;          //SD-Card default pin
 
-const int chipSelect = BUILTIN_SDCARD;          //SD-Card default pin
-
-char value[25000]={},temp[25]={};           //Arrays to hold the data MCU read from the text file
+char value[50]={},temp[15]={};           //Arrays to hold the data MCU read from the text file
 static int ndx = 0;                        //To verify the line number MCU is reading
 
 
@@ -21,12 +21,12 @@ void setup() {
   Serial.begin(9600);
   // wait for Serial Monitor to connect. Needed for native USB port boards only:
   while (!Serial);
-  pinMode(BUILTIN_SDCARD, OUTPUT);
-  digitalWrite(BUILTIN_SDCARD, HIGH);
+  pinMode(chipSelect, OUTPUT);
+  digitalWrite(chipSelect, HIGH);
 
   Serial.print("Initializing SD card...");
 
-  if (!SD.begin(BUILTIN_SDCARD)) {
+  if (!SD.begin(chipSelect)) {
     Serial.println("initialization failed. Things to check:");
     Serial.println("1. is a card inserted?");
     Serial.println("2. is your wiring correct?");
