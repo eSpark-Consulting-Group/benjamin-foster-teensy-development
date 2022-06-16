@@ -16,6 +16,7 @@ void Ledseq_Read();
 void Ledseq_parseData(char* workVar);
 void LedSeqFiles();
 void Led_Initialization();
+void init_configuration();
 
 //SD Card Pinouts & Configuration
 const int chipSelect = BUILTIN_SDCARD;  
@@ -58,11 +59,17 @@ uint8_t nRev = 0;
 bool revFlag = false;
 bool readFlag = false;
 
+//Multiple Files Variables:
+int16_t num_LedSeqFiles; //variable to hold the number of LedSeq Text files.
+String textFileStr;      //String variable to use as an "LedSeqn.txt", where 'n' is the number of LedSeq text file.
+int TrigOn,TrigOff;       //Variables to hold Camera Triggering On/Off values.
+
 void setup() 
 {
   Serial.begin(115200);
   Led_Initialization();
   SD_Card_Initialization();
+  init_configuration();
   ArcMotor_Initialization();
   ArcTimer.begin(ArcStep, 10000);  // Run ArcMotor every 0.00125 seconds ( 2500 / 2  = 1250 ) , 2500 - > for 1 complete step including HIGH & LOW at step-pin
   EncoderInit();
@@ -76,8 +83,9 @@ void loop()
 void Ledseq_Read() 
 { 
   //Logic to open .txt files at each arc rotation
-  //LedSeqFiles(); 
-   if( revFlag == true ){
+  LedSeqFiles(); 
+  /* if( revFlag == true )
+   {
      if(MyFile.available())
      {
       MyFile.close();
@@ -85,7 +93,7 @@ void Ledseq_Read()
       MyFile = SD.open("LedSeq1.txt");
       Serial.println("************************CLOSED & OPEN LEDSEQ.TXT");
       revFlag = false;
-  }
+  }*/
   while (  MyFile.available() && readFlag == true ) 
   {
     for( int lines = 1; lines <= 50; lines++)
@@ -116,6 +124,64 @@ void Ledseq_parseData(char* workVar)
     brightness[2] = atoi(strtokIndx);
     leds[ledNum] = CRGB(brightness[0], brightness[1], brightness[2]);
     
+}
+/*
+ * LedSeqFiles() 
+ *  - It checks the revFlag (true: when arc rotates 1 complete revolution, defines in updateEncoder() ISR). 
+ *  - It Opens & Closes 'n' number of the "LedSeqn.txt" files, at each revFlag. 
+ */
+void LedSeqFiles()
+{
+  static uint16_t n = 1; 
+  if( revFlag == true )
+  {
+    revFlag = false;
+    
+    //If any file is open already, it'll closed it!
+    if(MyFile.available())
+    {
+      MyFile.close(); //not secure!!
+    }
+    
+    //condition To Open Multiple Files after each Revolution
+    if( n <= num_LedSeqFiles )
+    {
+      textFileStr = "LedSeq" + String(n) + ".txt";
+      textFileStr.toCharArray(token,20);
+      Serial.println(token);
+    
+      MyFile = SD.open(token);
+      Serial.println(textFileStr + " is open!");
+    
+      if(n == num_LedSeqFiles){ n = 0; }      //Serial.println("Objective Achieved!");
+      n++;
+    }
+  }
+}
+/*
+ *  init_configuration() 
+ *  - it extract the initial configurations of the project from "Config.txt"
+ *  - includes : Number of Led Sequence Text files, Camera Trigger On Position, Camera Trigger Off Position,
+ *  - more configurations can be added
+ */
+void init_configuration()
+{
+  MyFile = SD.open("Config.txt");
+  
+  _buffer = MyFile.readStringUntil('\n');
+  _buffer.toCharArray(token,20);
+  
+  char* strtokIndx;                                  
+  strtokIndx = strtok(token, ",");
+  num_LedSeqFiles = atoi(strtokIndx);
+
+  strtokIndx = strtok(NULL, ",");
+  TrigOn = atoi(strtokIndx);
+
+  strtokIndx = strtok(NULL, ",");
+  TrigOff = atoi(strtokIndx);
+  
+  MyFile.close();
 }
 // SD Card Initialization:
 void SD_Card_Initialization() 
@@ -177,7 +243,7 @@ void updateEncoder()
   //Serial.print("MainEncoder.read() : ");
   //Serial.println( (MainEncoder.read() / 4) );
   //stepCount++;
-    if( (MainEncoder.read() / 4) == indexNum_Ledseq )
+    if( (MainEncoder.read() / 4) == (indexNum_Ledseq-1) )  
     {
       FastLED.show();
     }
@@ -197,4 +263,5 @@ void zeroPos_isr()
   revFlag = true;
   Serial.print(" Rev Completed! ");
   }
-}//if you can send me this file on telegram also, it'll be better!
+  //LedSeqFiles();
+}//if you can send me this file on telegram also, it'll be better!?
