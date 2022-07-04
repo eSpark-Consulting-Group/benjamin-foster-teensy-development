@@ -2,7 +2,6 @@
 
 extern bool readFlag;
 
-
  /*
   *   SDCardInit(const byte CS) : 
   *     
@@ -17,7 +16,7 @@ extern bool readFlag;
   *                 ERR
   *                 If initialization is failed.
   */
-bool SDCard::SDCardInit(uint8_t chipSelect)
+int8_t SDCard::SDCardInit(uint8_t chipSelect)
 {
   csPin = chipSelect;
   while (!Serial);
@@ -27,7 +26,6 @@ bool SDCard::SDCardInit(uint8_t chipSelect)
 
   if (!SD.begin(csPin)) 
   {
-    Serial.println("SD Card Initialization failed.");
     return ERR;
   }
   else
@@ -62,8 +60,12 @@ char* SDCard::LedSeqRead(File* MyFile)
   {
     _buffer = (*MyFile).readStringUntil('\n');
     _buffer.toCharArray(token,30);
-
+    Serial.println(_buffer);
     return token;
+  }
+  else
+  {
+    return NULL;
   }
 }
 
@@ -84,24 +86,24 @@ char* SDCard::LedSeqRead(File* MyFile)
  *                  
  */
 
-uint32_t* SDCard::LedSeqParse(char* LedSeqLine)
+LedData SDCard::LedSeqParse(char* LedSeqLine)
 {                                    
     char *parseVal; 
                                      
     parseVal = strtok(LedSeqLine, ","); 
-    LedData[0] = atoi(parseVal);
+    Led.encoderPos = atoi(parseVal);
     
     parseVal = strtok(NULL, ",");
-    LedData[1] = atoi(parseVal);
+    Led.ledNum = atoi(parseVal);
     
     parseVal = strtok(NULL, ",");
-    LedData[2] = atoi(parseVal);
+    Led.R = atoi(parseVal);
     
     parseVal = strtok(NULL, ",");
-    LedData[3] = atoi(parseVal);
+    Led.G = atoi(parseVal);
     
     parseVal = strtok(NULL, "\n");
-    LedData[4] = atoi(parseVal);
-
-    return LedData;
+    Led.B = atoi(parseVal);
+    
+    return Led;
 }

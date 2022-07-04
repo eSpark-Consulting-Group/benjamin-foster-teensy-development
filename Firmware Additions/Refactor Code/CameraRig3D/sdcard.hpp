@@ -5,19 +5,27 @@
 #include <SD.h>
 #include <SPI.h>
 
-#define ERR 0
-#define SUCCESS 1
+#define ERR -1
+#define SUCCESS 0
+
+typedef struct {    
+    uint16_t encoderPos;
+    uint8_t ledNum;
+    uint8_t R;
+    uint8_t G;
+    uint8_t B;   
+}LedData;
 
 class SDCard {
   private:
     uint8_t csPin;
     char token[30];
-    uint32_t LedData[5];
+    LedData Led;
     
   public:
-    bool      SDCardInit(uint8_t chipSelect = 9);
-    char*     LedSeqRead(File* MyFile);
-    uint32_t* LedSeqParse(char* LedSeqLine);
+    int8_t      SDCardInit(uint8_t chipSelect = 9);
+    char*       LedSeqRead(File* MyFile);
+    LedData     LedSeqParse(char* LedSeqLine);
 };
 
 #endif
